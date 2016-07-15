@@ -68,7 +68,7 @@ sub create_nagiosContact {
 
 my $contact = << "END_MESSAGE";
 
-define contact {
+define contact{
     contact_name       $fullName
     use                $contactType
     alias              $fullName

@@ -41,20 +41,16 @@ if ($objldapuser->get_dn) {           # if a user was found in ldap create an eq
                                 });
     
     for(my $i = 0; $i <= $objconfigfile->get_count -1 ; $i++) {            # run the fullName against the config file objects to ensure that it does not exist yet
-        #print Dumper($objconfigfile->get_allobjects->[$i]->{attribute}->{contact_name});
+        print Dumper($objconfigfile->get_allobjects->[$i]->{attribute}->{contact_name});
 
         if ($contact->get_fullName eq $objconfigfile->get_allobjects->[$i]->{attribute}->{contact_name}) {
             croak( $contact->get_fullName . "already exists");
         }
     }
 
-   print $contact->get_fullName . " does not exist yet!\n";
+    print $contact->get_fullName . " does not exist yet!\n";
 
-   $objconfigfile->add_object($contact->createContact);
-
-#    print Dumper($objconfigfile->get_allobjects);
-#    print Dumper($contact);
-#    print Dumper($contact->create_nagiosContact);
+   $objconfigfile->write_object($contact->create_nagiosContact);
 
 }
 else{
