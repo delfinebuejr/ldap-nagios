@@ -50,7 +50,9 @@ if ($objldapuser->get_dn) {           # if a user was found in ldap create an eq
 
     print $contact->get_fullName . " does not exist yet!\n";
 
-   $objconfigfile->write_object($contact->create_nagiosContact);
+    $objconfigfile->write_object($contact->create_nagiosContact);
+
+    
 
 }
 else{

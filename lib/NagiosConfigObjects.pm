@@ -4,6 +4,8 @@ package NagiosConfigObjects;
 ## Create Date: 14/07/2016
 ## Modified Date: 15/07/2016
 ## create and collect objects defined in a nagios configuration file.
+## The object instance can collect one type of object defined from the nagios configuration.
+## This is to reduce the complexity for searching and other things. 
 ## To Do: Add, Delete, and Modify objects from file
 
 use strict;
@@ -54,12 +56,98 @@ sub write_object {
 }
 
 sub erase_object {
+    my ( $self, $objname )  = @_;
+  
+    my $startline = -1;
+    my $endline = -1;
+ 
+    print $self->{file} . "\n";    
 
+    open(FH, "<" . $self->{file}) or die $!;
 
+    my @fileobj = <FH>;
 
+    close FH;
 
+    my $startdelimitter = "define " . $self->{filter} . "{";
+    my $enddelimitter = "}";
+    my $start_array_element = -1;
+    my $counter = -1;
 
+    foreach (@fileobj){                                # iterate each array element ( line of file )
+       $counter++;
+       my $type =   index($_, $self->{filter});        # check if filter exists  
+       my $tname =  index($_,$objname);                # check if target object name exists
+
+       chomp;
+
+       if ( ($type gt -1)  and ($tname gt 1) ) {       # if filter and objectname exists in the same line
+          
+            my $iscommentedhash = index($_, '#');      # check if a hash is found before the filter type - meaning it is commented out.
+           
+            next if ( ($iscommentedhash ge 0) and ($iscommentedhash lt $type) );  
+           
+            $start_array_element = $counter;           # save the array index if the target object was found 
+
+       }
+    }
+
+    if ( $start_array_element gt -1 ) {                # if the object was found in the array then process it
+
+        print $fileobj[$start_array_element] . "\n";
+
+        # read up and seek the $startdelimitter
+
+        for( my $i = $start_array_element ; $i >=0  ; $i--){
+
+            my $foundstart = index($fileobj[$i],$startdelimitter);
+
+            next if ( $foundstart eq -1 );              # skip  unless the $startdelimitter pattern is found
+
+            my $temp = $fileobj[$i];
+            $temp  =~ s/^\s+|\s+$//g;
+
+            next if ( index( $temp, "#" ) eq 0 );       # skip if a hash if found at the beginning of the string ( index 0 )
+            
+            print "$i: $temp\n";
+            $startline = $i;
+            last;
+
+        }
+
+        # read down and seek the $end delimitter
+
+        for( my $j =  $start_array_element; $j <= scalar @fileobj ; $j++){
+     
+            my $foundend = index($fileobj[$j],$enddelimitter);
+
+            next if ( $foundend eq -1 );
+
+            my $temp = $fileobj[$j];
+            $temp  =~ s/^\s+|\s+$//g;
+
+            if (index($temp, '}') eq 0) {               # exit loop if the string starts with "}"
+               
+               print "$j: $temp \n";
+               $endline = $j;
+               last;
+            }
+ 
+        }
+
+    }
+
+    print "$startline -- $endline --" .  (($endline - $startline) + 1)  . " \n";
+
+    splice @fileobj, $startline, (($endline - $startline) + 1);            # delete the elements from the array
+                    
+                                                                           # write the array to a file ( maybe overwrite the original file)
+                                                                           # winmerge/diff to validate the deletion change
 }
+
+
+
+
 
 sub _process_file {
 
