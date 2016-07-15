@@ -48,7 +48,7 @@ sub write_object {
 
     open(FH, ">>" . $self->{file}) or die $!;
 
-    print $objdef;
+    print FH $objdef;
 
     close FH;
 }
