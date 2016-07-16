@@ -145,10 +145,6 @@ sub erase_object {
                                                                            # winmerge/diff to validate the deletion change
 }
 
-
-
-
-
 sub _process_file {
 
     my ( $self ) = shift;
