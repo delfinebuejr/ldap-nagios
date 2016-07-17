@@ -142,7 +142,19 @@ sub erase_object {
     splice @fileobj, $startline, (($endline - $startline) + 1);            # delete the elements from the array
                     
                                                                            # write the array to a file ( maybe overwrite the original file)
-                                                                           # winmerge/diff to validate the deletion change
+    my $tempfile = '/root/contacts_copy.conf';
+
+    foreach (@fileobj) { 
+
+        open(FH, ">>" . $tempfile);
+        print FH $_ . "\n";
+                
+    }
+    
+    close FH;
+
+    
+                                                              # winmerge/diff to validate the deletion change
 }
 
 sub _process_file {
