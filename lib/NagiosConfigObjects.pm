@@ -153,6 +153,8 @@ sub erase_object {
     
     close FH;
 
+
+    $self->_process_file;                                                     # reload the modified file
     
                                                               # winmerge/diff to validate the deletion change
 }
