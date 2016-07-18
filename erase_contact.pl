@@ -8,7 +8,7 @@ use lib 'lib/';
 use Data::Dumper;
 use NagiosConfigObjects;
 
-my $file = '/var/www/cgi-bin/contacts.cfg';
+my $file = '/home/svn_nagios_config/nagios/etc/objects/contacts.cfg';
 my $filter = 'contact';
 my $target = 'delfin ebue';
 

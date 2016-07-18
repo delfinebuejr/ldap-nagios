@@ -1,5 +1,10 @@
 #!/usr/bin/perl
 
+# Searches openldap for a user account that matches $targetUser.
+# instantiates a NagiosConfigObject which is used for validating
+# if the target user exists in 
+
+
 use warnings;
 use strict;
 use Carp qw(croak);
@@ -14,14 +19,16 @@ my $connstring = 'localhost,cn=manager,redhat';
 my $ldapUserBase = 'ou=Users,dc=local,dc=lan';
 my $ldapGroupBase = 'ou=Group,dc=local,dc=lan';
 my $targetUser = 'nnit-dfie1';
+my $configFile = '/home/svn_nagios_config/nagios/etc/objects/contacts.cfg';
+my $objectType = 'contact';
 
 my $contactGroup = 'nnit-admins';
 my $contactType = 'admins';
 
 my $objldapuser = LDAPuser->new();
 my $objconfigfile = NagiosConfigObjects->new({
-                                              file => '/var/www/cgi-bin/contacts.cfg',
-                                              filter => 'contact'
+                                              file => $configFile,
+                                              filter => $objectType
                                              });
 
 #$objldapuser->search_user_debug( $targetUser, $connstring, $ldapUserBase, $ldapGroupBase );
