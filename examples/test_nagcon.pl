@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use lib 'lib';
+use lib '../lib';
 
 use Data::Dumper;
 use NagiosConfigObjects;

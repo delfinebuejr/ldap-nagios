@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use Carp qw(croak);
 use Data::Dumper;
-use lib 'lib';
+use lib '../lib';
 
 use LDAPuser;
 use NagiosContact;
