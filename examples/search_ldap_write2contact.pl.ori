@@ -4,6 +4,7 @@
 # instantiates a NagiosConfigObject which is used for validating
 # if the target user exists in 
 
+
 use warnings;
 use strict;
 use Carp qw(croak);
@@ -13,24 +14,22 @@ use lib '../lib';
 use LDAPuser;
 use NagiosContact;
 use NagiosConfigObjects;
-use SVN::Client;
 
-my $connstring = '10.0.3.4,cn=manager,redhat';
+my $connstring = 'localhost,cn=manager,redhat';
 my $ldapUserBase = 'ou=Users,dc=local,dc=lan';
 my $ldapGroupBase = 'ou=Group,dc=local,dc=lan';
 my $targetUser = 'nnit-dfie1';
-my $configFile = 'contacts.cfg';
+my $configFile = '/home/svn_nagios_config/nagios/etc/objects/contacts.cfg';
 my $objectType = 'contact';
-
-my $svn_local_workspace = '/usr/local/nagios/tmp';
-my $svn_url = 'http://www.svn1.local.lan/svn/repo1/trunk/nagios_config/nagios/etc/objects';
-my $svn_username = "dfie";
-my $svn_password = "redhat";
 
 my $contactGroup = 'nnit-admins';
 my $contactType = 'admins';
 
 my $objldapuser = LDAPuser->new();
+my $objconfigfile = NagiosConfigObjects->new({
+                                              file => $configFile,
+                                              filter => $objectType
+                                             });
 
 #$objldapuser->search_user_debug( $targetUser, $connstring, $ldapUserBase, $ldapGroupBase );
 $objldapuser->search_user( $targetUser, $connstring, $ldapUserBase, $ldapGroupBase );
@@ -40,8 +39,6 @@ print Dumper($objldapuser);
 if ($objldapuser->get_dn) {           # if a user was found in ldap create an equivalent nagios contact object
     print "true\n";
 
-### SERIALIZE THE LDAP INFORMATION
-    
     my $contact = NagiosContact->new({
                                    fname => $objldapuser->get_fname,
                                    lname => $objldapuser->get_lname,
@@ -50,64 +47,22 @@ if ($objldapuser->get_dn) {           # if a user was found in ldap create an eq
                                    contactType => $contactType
                                 });
     
-    
-### PREPARE THE LOCAL WORKSPACE
-
-    my $client = new SVN::Client(
-      auth => [
-          SVN::Client::get_simple_provider(),
-          SVN::Client::get_simple_prompt_provider(\&simple_prompt,2),
-          SVN::Client::get_username_provider()
-      ]);
-
-### CHECKOUT CONFIG FILE
-
-    if ( -e $svn_local_workspace ) {
-
-        unlink glob "$svn_local_workspace/*";
-
-    }
-
-    $client->checkout($svn_url,$svn_local_workspace,'HEAD',1);
-    
-### CREATE CONTACTS FILE OBJECT
-
-    my $objconfigfile = NagiosConfigObjects->new({
-                                              file => "$svn_local_workspace/$configFile",
-                                              filter => $objectType
-                                             });
-
     for(my $i = 0; $i <= $objconfigfile->get_count -1 ; $i++) {            # run the fullName against the config file objects to ensure that it does not exist yet
         print Dumper($objconfigfile->get_allobjects->[$i]->{attribute}->{contact_name});
 
         if ($contact->get_fullName eq $objconfigfile->get_allobjects->[$i]->{attribute}->{contact_name}) {
-            croak( $contact->get_fullName . " nagios contact already exists. Nothing to do.");
+            croak( $contact->get_fullName . "already exists");
         }
     }
 
-### WRITE CONTACT TO FILE IF IT DOES NOT EXISTS 
-
-    print "Adding " . $contact->get_fullName . " to $configFile\n";
+    print $contact->get_fullName . " does not exist yet!\n";
 
     $objconfigfile->write_object($contact->create_nagiosContact);
 
-### CHECKIN UPDATED FILE
+    
 
-    $client->commit("$svn_local_workspace/$configFile",0);
-   
 }
 else{
-   print "User does not exist in LDAP server!\n";
-}
-
-# FUNCTION DEFINITIONS
-
-sub simple_prompt {
-    my ($cred, $realm, $default_username, $may_save, $pool) = @_;
-
-    chomp($svn_username);
-    $cred->username($svn_username);
-    chomp($svn_password);
-    $cred->password($svn_password);
+   print "false\n";
 }
 
