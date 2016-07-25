@@ -14,21 +14,28 @@ use LDAPuser;
 use NagiosContact;
 use NagiosConfigObjects;
 use SVN::Client;
+use Config::Simple;
 
-my $connstring = '10.0.3.4,cn=manager,redhat';
-my $ldapUserBase = 'ou=Users,dc=local,dc=lan';
-my $ldapGroupBase = 'ou=Group,dc=local,dc=lan';
+
+my $config = '../config/app.conf';
+
+my $cfg = new Config::Simple($config);
+
+my $connstring = $cfg->param('connstring');
+my $ldapUserBase = $cfg->param('ldapUserBase');
+my $ldapGroupBase = $cfg->param('ldapGroupBase');
+
 my $targetUser = 'nnit-dfie1';
-my $configFile = 'contacts.cfg';
-my $objectType = 'contact';
+my $configFile = $cfg->param('configFile');
+my $objectType = $cfg->param('objectType');
 
-my $svn_local_workspace = '/usr/local/nagios/tmp';
-my $svn_url = 'http://www.svn1.local.lan/svn/repo1/trunk/nagios_config/nagios/etc/objects';
-my $svn_username = "dfie";
-my $svn_password = "redhat";
+my $svn_local_workspace = $cfg->param('svn_local_workspace');;
+my $svn_url = $cfg->param('svn_url');
+my $svn_username = $cfg->param('svn_username');
+my $svn_password = $cfg->param('svn_password');
 
-my $contactGroup = 'nnit-admins';
-my $contactType = 'admins';
+my $contactGroup = $cfg->param('contactGroup');
+my $contactType = $cfg->param('contactType');
 
 my $objldapuser = LDAPuser->new();
 
