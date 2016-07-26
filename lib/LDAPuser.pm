@@ -62,6 +62,13 @@ sub get_count {
     return scalar @ldapusers;
 }
 
+sub get_groupMembership {
+    my ( $self ) = shift;
+    return $self->{attribute}{groupMembership};
+}
+
+
+
 sub search_user {
     my ( $self, $targetUser, $connstring, $ldapUserBase, $ldapGroupBase ) = @_;  
 
@@ -115,7 +122,7 @@ sub search_user {
         }
     }
     else{
-       print "user with cn=" . $self->{attribute}{cn} . " or uid=" .$self->{attribute}{uid} . " does not exist\n";
+        return undef;
     } 
  
     $ldap->unbind; 
