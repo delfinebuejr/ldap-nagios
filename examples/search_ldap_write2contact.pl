@@ -37,6 +37,12 @@ my $svn_password = $cfg->param('svn_password');
 my $contactGroup = $cfg->param('contactGroup');
 my $contactType = $cfg->param('contactType');
 
+print "targetUser: $targetUser\n";
+print "connstring: $connstring\nldapUserBase: $ldapUserBase\nldapGroupBase: $ldapGroupBase\n";
+print "configFile: $configFile\nobjectType: $objectType\n";
+print "svn_local_workspace: $svn_local_workspace\n$svn_url: svn_url\nsvn_username: $svn_username\nsvn_password: $svn_password\n";
+
+
 my $objldapuser = LDAPuser->new();
 
 #$objldapuser->search_user_debug( $targetUser, $connstring, $ldapUserBase, $ldapGroupBase );
