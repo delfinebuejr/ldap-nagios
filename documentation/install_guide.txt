@@ -1,0 +1,13 @@
+
+
+Install the ff cpan modules:
+
+# yum install perl-Config-Simple.noarch     or      # cpan -i Config::Simple
+
+# yum install subversion-perl
+
+# cpan -i Net::LDAP
+
+# cpan -i Carp
+
+# cpan -i Data::Dumper
