@@ -97,8 +97,8 @@ sub search_user {
             $self->set_lname($_->get_value('sn'));
             $self->set_cn($_->get_value('cn'));
             $self->set_uid($_->get_value('uid'));
-            $self->set_email($_->('mail'));           
-            $self->set_dn($_->asn->{objectName});
+            $self->set_email($_->get_value('mail'));           
+            $self->set_dn($_->dn);
 
             my $dn = $self->get_dn;
             my $uid = $self->get_uid;
