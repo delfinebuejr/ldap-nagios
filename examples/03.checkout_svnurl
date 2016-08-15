@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Time::HiRes qw ( time alarm sleep );
+use SVN::Client;
+our ($svn_username,$svn_password);
+
+my $svn_url = "http://www.svn1.local.lan/svn/repo1/trunk/nagios_config/nagios/etc/objects";
+$svn_username = "nnit-dfie";
+$svn_password = "dfie1324";
+my $svn_local_workspace = "/tmp/$svn_username";
+                                                                             
+if ( -e $svn_local_workspace ) {                                           # clean-up local workspace
+    unlink glob "$svn_local_workspace/*";
+}
+                                                                           # prepare svn client for checkout
+my $client = new SVN::Client(
+                              auth => [
+                                       SVN::Client::get_simple_provider(),
+                                       SVN::Client::get_simple_prompt_provider(\&simple_prompt,2),
+                                       SVN::Client::get_username_provider()
+                                      ]
+                            );
+
+$client->checkout($svn_url,$svn_local_workspace,'HEAD',1);                  # checkout the config file
+
+print "successfully checkouted out $svn_local_workspace at " . time . "\n";
+
+
+sub simple_prompt {
+    my ($cred, $realm, $default_username, $may_save, $pool) = @_;
+
+    chomp($svn_username);
+    $cred->username($svn_username);
+    chomp($svn_password);
+    $cred->password($svn_password);
+}
+
+
+
